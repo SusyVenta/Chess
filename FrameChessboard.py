@@ -33,31 +33,28 @@ class FrameChessboard(tk.Frame):
         self.menubar.add_cascade(label="Menu", menu=self.filemenu)
 
     def highlight_moves_by_clicking_on_square(self, event):
+        # get object closest to to current mouse position
         item2 = self.board.find_closest(event.x, event.y)
+        # get 3d tag of the closest element
         current_piece = self.board.gettags(item2)[2]
+        #print (self.board.itemcget(item2, "tag")) # --> h8, black, rook, current.
+        # item = highlighted piece
         item = self.a7
 
         if current_piece == "rook" and 'a7' in self.board.gettags(item)[0]:
+            # get current color of the square
             current_color = self.board.itemcget(item, 'fill')
+            # if current square is not highlighted
             if current_color == 'grey' or current_color == "white":
+                # highlight square
                 self.board.itemconfig(item, fill='green')
             else:
+                # if it was already highlighted, set it back to its original color
                 self.board.itemconfig(item, fill=self.board.gettags(item)[1])
-
-    def identify_closest_square(self, event):
-        item = self.board.find_closest(event.x, event.y)[0]
-        tags = self.board.gettags(item)
-        print (tags)
-        canvas = event.widget
-        x = canvas.canvasx(event.x)
-        y = canvas.canvasy(event.y)
-        canvas.find_closest(x, y)
-        print (canvas.find_closest(x, y))
 
     def board_squares(self):
         self.board = tk.Canvas(self, width=500, height=500)
         self.board.pack()
-        self.board.bind('<Button-2>', self.identify_closest_square)
         self.board.bind('<Button-1>', self.highlight_moves_by_clicking_on_square)
 
         # DRAW CHESSBOARD
@@ -200,14 +197,16 @@ class FrameChessboard(tk.Frame):
 
     def show_default_pieces(self):
         # BLACKS
-        self.a8_piece = tk.Canvas.create_text(self.board, 30, 30, text=self.unicode_piece_symbols["r"], font=("Arial", 30))
+        self.a8_piece = tk.Canvas.create_text(self.board, 30, 30, text=self.unicode_piece_symbols["r"], font=("Arial", 30),
+                                              tag=("a8", "black", "rook"))
         self.b8_piece = tk.Canvas.create_text(self.board, 92, 30, text=self.unicode_piece_symbols["k"], font=("Arial", 30))
         self.c8_piece = tk.Canvas.create_text(self.board, 157, 30, text=self.unicode_piece_symbols["b"], font=("Arial", 30))
         self.d8_piece = tk.Canvas.create_text(self.board, 218, 30, text=self.unicode_piece_symbols["q"], font=("Arial", 30))
         self.e8_piece = tk.Canvas.create_text(self.board, 280, 30, text=self.unicode_piece_symbols["ki"], font=("Arial", 30))
         self.f8_piece = tk.Canvas.create_text(self.board, 343, 30, text=self.unicode_piece_symbols["b"], font=("Arial", 30))
         self.g8_piece = tk.Canvas.create_text(self.board, 403, 30, text=self.unicode_piece_symbols["k"], font=("Arial", 30))
-        self.h8_piece = tk.Canvas.create_text(self.board, 469, 30, text=self.unicode_piece_symbols["r"], font=("Arial", 30))
+        self.h8_piece = tk.Canvas.create_text(self.board, 469, 30, text=self.unicode_piece_symbols["r"], font=("Arial", 30),
+                                              tag=("h8", "black", "rook"))
 
         self.a7_piece = tk.Canvas.create_text(self.board, 32, 95, text=self.unicode_piece_symbols["p"], font=("Arial", 30))
         self.b7_piece = tk.Canvas.create_text(self.board, 94, 95, text=self.unicode_piece_symbols["p"], font=("Arial", 30))
