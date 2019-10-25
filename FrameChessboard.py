@@ -34,46 +34,15 @@ class FrameChessboard(tk.Frame):
         self.board.tag_bind("piece", "<ButtonPress-1>", self.on_piece_press)
         self.board.tag_bind("piece", "<ButtonRelease-1>", self.on_piece_release)
         self.board.tag_bind("piece", "<B1-Motion>", self.on_piece_motion)
+
         self.board.tag_bind("square", "<Motion>", self.highlight_square)
+
 
     def highlight_square(self, event):
         item = self.board.find_closest(event.x, event.y)
-        try:
-            item = self.board.find_overlapping(item)
-        except:
-            pass
         coordinates_of_square = self.board.coords(item)
-        print(coordinates_of_square)
         # finds piece id number even by hovering on square.
-        # print(self.board.find_enclosed(coordinates_of_square[0], coordinates_of_square[1], coordinates_of_square[2], coordinates_of_square[3]))
         self.board.itemconfig(item, activefill="#F9E79F")
-
-    def allow_squres_to_highlight(self, event):
-        # any object with the "piece" tag
-        self.board.tag_bind("square", "<Motion>", self.on_piece_press)
-        # add bindings for mouse hovering over board squares
-        # get object closest to to current mouse position
-        item = self.board.find_closest(event.x, event.y)
-        # get 3d tag of the closest element
-        current_piece = self.board.gettags(item)[2]
-        # get object closest to to current mouse position
-        item2 = self.board.find_closest(event.x, event.y)
-        # get 3d tag of the closest element
-        current_piece = self.board.gettags(item2)[2]
-        # item = highlighted piece
-        # item = self.frames["FrameChessboard"].a7
-
-        if current_piece == "rook" and 'a7' in self.board.gettags(item)[0]:
-            # get current color of the square
-            current_color = self.board.itemcget(item, 'fill')
-            # if current square is not highlighted
-            if current_color == 'grey' or current_color == "white":
-                # highlight square
-                self.board.itemconfig(item, fill='green')
-            else:
-                # if it was already highlighted, set it back to its original color
-                self.board.itemconfig(item, fill=self.board.gettag(item2)[0])
-
 
     def start(self):
         self.menu()
@@ -102,6 +71,18 @@ class FrameChessboard(tk.Frame):
         self._drag_data["x"] = 0
         self._drag_data["y"] = 0
 
+        self.find_current_square(event.x, event.y)
+
+    def find_current_square(self, x, y):
+        for item in self.board.find_withtag("square"):
+            if self.board.coords(item)[0] <= x <= self.board.coords(item)[2] and self.board.coords(item)[1] <= y <= self.board.coords(item)[3]:
+                coords_of_current_square = self.board.coords(item)
+                print(self.board.gettags(item))
+                print(self.board.coords(item))
+                print(self.board.gettags("current"))
+                print(self.board.coords("current"))
+                return item
+
     def on_piece_motion(self, event):
         '''Handle dragging of an object'''
         # compute how much the mouse has moved
@@ -109,9 +90,12 @@ class FrameChessboard(tk.Frame):
         delta_y = event.y - self._drag_data["y"]
         # move the object the appropriate amount
         self.board.move(self._drag_data["item"], delta_x, delta_y)
+
         # record the new position
         self._drag_data["x"] = event.x
         self._drag_data["y"] = event.y
+
+        self.find_current_square(event.x, event.y)
 
     def highlight_moves_by_clicking_on_square(self, event):
         # get object closest to to current mouse position
@@ -157,7 +141,7 @@ class FrameChessboard(tk.Frame):
                     else:
                         color = "white"
 
-                square_coords = letters[letter] + str(number)
+                square_coords = letters[letter] + str(9 - number)
                 tk.Canvas.create_rectangle(self.board, coordinates[0], coordinates[1], coordinates[2], coordinates[3],
                                            fill=color, tags=("square", square_coords))
                 # write small coordinates in initial squares
