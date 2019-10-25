@@ -6,7 +6,6 @@ from win32api import GetSystemMetrics
 from ctypes import windll
 
 
-
 class Application(tk.Tk):
     def __init__(self, *args, **kwargs):
         # Initialize the GUI
@@ -14,7 +13,7 @@ class Application(tk.Tk):
         self.window = tk.Frame(self, width=500, height=500, background="#232F3E")
         self.window.pack(side="top", expand=True)
         self.geometry('%dx%d+%d+%d' % (500, 520, self.center_app_inthescreen()[0],
-                                    self.center_app_inthescreen()[1]))
+                                       self.center_app_inthescreen()[1]))
         self.title("Chess")
         self.unblur()
         self.resizable(False, False)
@@ -45,7 +44,3 @@ class Application(tk.Tk):
         frame.grid(sticky="news", columnspan=2, rowspan=30)
         frame.start()
         frame.tkraise()
-
-
-
-

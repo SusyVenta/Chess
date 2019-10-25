@@ -1,4 +1,5 @@
 import tkinter as tk
+from Game import *
 
 
 class FrameChessboard(tk.Frame):
@@ -14,24 +15,27 @@ class FrameChessboard(tk.Frame):
             "KI": u"♔", "ki": u"♚",
             "P": u"♙", "p": u"♟",
         }
-        self.pieces_position = {"a8": "r", "b8": "k", "c8": "b", "d8": "q", "e8": "ki", "f8": "b", "g8": "k", "h8": "r",
-                                "a7": "p", "b7": "p", "c7": "p", "d7": "p", "e7": "p", "f7": "p", "g7": "p", "h7": "p",
-                                "a2": "P", "b2": "P", "c2": "P", "d2": "P", "e2": "P", "f2": "P", "g2": "P", "h2": "P",
-                                "a1": "R", "b1": "K", "c1": "B", "d1": "Q", "e1": "KI", "f1": "B", "g1": "K", "h1": "R"}
-        self.current_color = ""
-        ##################
+        self.game = self.start_game()
+        self.pieces_position = self.game.pieces_position
+        self.player_moving = self.game.player_moving
+
         # this data is used to keep track of an item being dragged
         self._drag_data = {"x": 0, "y": 0, "item": None}
 
         self.board = tk.Canvas(self, width=500, height=500)
         self.board.pack()
-        self.allow_pieces_to_move()
+        self.allow_pieces_to_move(self.player_moving)
 
-    def allow_pieces_to_move(self):
+    @staticmethod
+    def start_game():
+        return Game()
+
+    def allow_pieces_to_move(self, current_player):
+        print(current_player)
         # add bindings for clicking, dragging and releasing over any object with the "piece" tag
-        self.board.tag_bind("piece", "<ButtonPress-1>", self.on_piece_press)
-        self.board.tag_bind("piece", "<ButtonRelease-1>", self.on_piece_release)
-        self.board.tag_bind("piece", "<B1-Motion>", self.on_piece_motion)
+        self.board.tag_bind("{}_piece".format(current_player), "<ButtonPress-1>", self.on_piece_press)
+        self.board.tag_bind("{}_piece".format(current_player), "<ButtonRelease-1>", self.on_piece_release)
+        self.board.tag_bind("{}_piece".format(current_player), "<B1-Motion>", self.on_piece_motion)
         self.board.tag_bind("square", "<Motion>", self.highlight_square)
 
     def print_piece_coordinates(self, event):
@@ -60,6 +64,7 @@ class FrameChessboard(tk.Frame):
         self.filemenu.add_command(label="New Game", command=self.controller.destroy)
 
     def on_piece_press(self, event):
+        print("pressing")
         '''Begining drag of an object'''
         adjusted_coordinates = self.adjust_current_piece_coords(self.find_current_square_coords(event.x, event.y))
         adjusted_x = adjusted_coordinates[0]
@@ -167,6 +172,9 @@ class FrameChessboard(tk.Frame):
         for coordinate in self.pieces_position.keys():
             canvas_element = self.board.find_withtag(coordinate)
             coordinates_of_element = self.board.coords(canvas_element)
+            piece_name = self.unicode_piece_symbols[self.pieces_position[coordinate]]
+            piece_color = "white" if self.pieces_position[coordinate].isupper() else "black"
+            piece_color_tag = "{}_piece".format(piece_color)
             tk.Canvas.create_text(self.board, coordinates_of_element[0] + 30, coordinates_of_element[1] + 30,
-                                  text=self.unicode_piece_symbols[self.pieces_position[coordinate]], font=("Arial", 30),
-                                  activefill="green", tags=("piece", self.pieces_position[coordinate]), width="30")
+                                  text=piece_name, font=("Arial", 30), activefill="green",
+                                  tags=(piece_color_tag, self.pieces_position[coordinate]), width="30")
