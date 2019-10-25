@@ -17,14 +17,13 @@ class FrameChessboard(tk.Frame):
         }
         self.game = self.start_game()
         self.pieces_position = self.game.pieces_position
-        self.player_moving = self.game.player_moving
 
         # this data is used to keep track of an item being dragged
         self._drag_data = {"x": 0, "y": 0, "item": None}
 
         self.board = tk.Canvas(self, width=500, height=500)
         self.board.pack()
-        self.allow_pieces_to_move(self.player_moving)
+        self.allow_pieces_to_move(self.game.player_moving)
 
     @staticmethod
     def start_game():
@@ -64,7 +63,6 @@ class FrameChessboard(tk.Frame):
         self.filemenu.add_command(label="New Game", command=self.controller.destroy)
 
     def on_piece_press(self, event):
-        print("pressing")
         '''Begining drag of an object'''
         adjusted_coordinates = self.adjust_current_piece_coords(self.find_current_square_coords(event.x, event.y))
         adjusted_x = adjusted_coordinates[0]
@@ -81,14 +79,18 @@ class FrameChessboard(tk.Frame):
         self._drag_data["x"] = 0
         self._drag_data["y"] = 0
 
+        # check that move has actually occurred
+        # if move successful --> update turn
+        self.game.update_current_player()
+
     def find_current_square_coords(self, x, y):
         for item in self.board.find_withtag("square"):
             if self.board.coords(item)[0] <= x <= self.board.coords(item)[2] and self.board.coords(item)[1] <= y <= self.board.coords(item)[3]:
                 coords_of_current_square = self.board.coords(item)
-                print(self.board.gettags(item))
-                print(self.board.coords(item))
-                print(self.board.gettags("current"))
-                print(self.board.coords("current"))
+                # print(self.board.gettags(item))
+                # print(self.board.coords(item))
+                # print(self.board.gettags("current"))
+                # print(self.board.coords("current"))
                 return coords_of_current_square
 
     def adjust_current_piece_coords(self, coordinates):

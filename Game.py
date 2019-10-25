@@ -10,6 +10,10 @@ class Game:
 
         # self.make_current_player_move()
 
+    def update_current_player(self):
+        self.player_moving = "black" if self.player_moving == "white" else "white"
+        print(self.player_moving)
+
     # def make_current_player_move(self):
 
 
