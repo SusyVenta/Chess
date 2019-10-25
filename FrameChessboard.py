@@ -34,13 +34,19 @@ class FrameChessboard(tk.Frame):
         self.board.tag_bind("piece", "<ButtonPress-1>", self.on_piece_press)
         self.board.tag_bind("piece", "<ButtonRelease-1>", self.on_piece_release)
         self.board.tag_bind("piece", "<B1-Motion>", self.on_piece_motion)
-
         self.board.tag_bind("square", "<Motion>", self.highlight_square)
 
+        # self.board.tag_bind("piece", "<Motion>", self.print_piece_coordinates)
+
+    def print_piece_coordinates(self, event):
+        item = self.board.find_closest(event.x, event.y)
+        coordinates_of_square = self.board.coords(item)
+        print(coordinates_of_square)
 
     def highlight_square(self, event):
         item = self.board.find_closest(event.x, event.y)
         coordinates_of_square = self.board.coords(item)
+        # print(coordinates_of_square)
         # finds piece id number even by hovering on square.
         self.board.itemconfig(item, activefill="#F9E79F")
 
@@ -59,10 +65,13 @@ class FrameChessboard(tk.Frame):
 
     def on_piece_press(self, event):
         '''Begining drag of an object'''
+        adjusted_coordinates = self.adjust_current_piece_coords(self.find_current_square_coords(event.x, event.y))
+        adjusted_x = adjusted_coordinates[0]
+        adjusted_y = adjusted_coordinates[1]
         # record the item and its location
         self._drag_data["item"] = self.board.find_closest(event.x, event.y)[0]
-        self._drag_data["x"] = event.x
-        self._drag_data["y"] = event.y
+        self._drag_data["x"] = adjusted_x
+        self._drag_data["y"] = adjusted_y
 
     def on_piece_release(self, event):
         '''End drag of an object'''
@@ -71,9 +80,9 @@ class FrameChessboard(tk.Frame):
         self._drag_data["x"] = 0
         self._drag_data["y"] = 0
 
-        self.find_current_square(event.x, event.y)
 
-    def find_current_square(self, x, y):
+
+    def find_current_square_coords(self, x, y):
         for item in self.board.find_withtag("square"):
             if self.board.coords(item)[0] <= x <= self.board.coords(item)[2] and self.board.coords(item)[1] <= y <= self.board.coords(item)[3]:
                 coords_of_current_square = self.board.coords(item)
@@ -81,21 +90,27 @@ class FrameChessboard(tk.Frame):
                 print(self.board.coords(item))
                 print(self.board.gettags("current"))
                 print(self.board.coords("current"))
-                return item
+                return coords_of_current_square
+
+    def adjust_current_piece_coords(self, coordinates):
+        print("adjusted coordinates: ")
+        print(coordinates[0] + 25, coordinates[1] + 10)
+        return [coordinates[0] + 30, coordinates[1] + 30]
+
 
     def on_piece_motion(self, event):
         '''Handle dragging of an object'''
+        adjusted_coordinates = self.adjust_current_piece_coords(self.find_current_square_coords(event.x, event.y))
+        adjusted_x = adjusted_coordinates[0]
+        adjusted_y = adjusted_coordinates[1]
         # compute how much the mouse has moved
-        delta_x = event.x - self._drag_data["x"]
-        delta_y = event.y - self._drag_data["y"]
+        delta_x = adjusted_x - self._drag_data["x"]
+        delta_y = adjusted_y - self._drag_data["y"]
         # move the object the appropriate amount
         self.board.move(self._drag_data["item"], delta_x, delta_y)
-
         # record the new position
-        self._drag_data["x"] = event.x
-        self._drag_data["y"] = event.y
-
-        self.find_current_square(event.x, event.y)
+        self._drag_data["x"] = adjusted_coordinates[0]
+        self._drag_data["y"] = adjusted_coordinates[1]
 
     def highlight_moves_by_clicking_on_square(self, event):
         # get object closest to to current mouse position
@@ -161,6 +176,6 @@ class FrameChessboard(tk.Frame):
         for coordinate in self.pieces_position.keys():
             canvas_element = self.board.find_withtag(coordinate)
             coordinates_of_element = self.board.coords(canvas_element)
-            tk.Canvas.create_text(self.board, coordinates_of_element[0] + 10, coordinates_of_element[1] + 10,
+            tk.Canvas.create_text(self.board, coordinates_of_element[0] + 30, coordinates_of_element[1] + 30,
                                   text=self.unicode_piece_symbols[self.pieces_position[coordinate]], font=("Arial", 30),
-                                  activefill="green", tags="piece", anchor='nw')
+                                  activefill="green", tags="piece", width="30")
