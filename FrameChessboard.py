@@ -20,8 +20,7 @@ class FrameChessboard(tk.Frame):
                                 "a1": "R", "b1": "K", "c1": "B", "d1": "Q", "e1": "KI", "f1": "B", "g1": "K", "h1": "R"}
         self.current_color = ""
         ##################
-        # this data is used to keep track of an
-        # item being dragged
+        # this data is used to keep track of an item being dragged
         self._drag_data = {"x": 0, "y": 0, "item": None}
 
         self.board = tk.Canvas(self, width=500, height=500)
@@ -29,14 +28,11 @@ class FrameChessboard(tk.Frame):
         self.allow_pieces_to_move()
 
     def allow_pieces_to_move(self):
-        # add bindings for clicking, dragging and releasing over
-        # any object with the "piece" tag
+        # add bindings for clicking, dragging and releasing over any object with the "piece" tag
         self.board.tag_bind("piece", "<ButtonPress-1>", self.on_piece_press)
         self.board.tag_bind("piece", "<ButtonRelease-1>", self.on_piece_release)
         self.board.tag_bind("piece", "<B1-Motion>", self.on_piece_motion)
         self.board.tag_bind("square", "<Motion>", self.highlight_square)
-
-        # self.board.tag_bind("piece", "<Motion>", self.print_piece_coordinates)
 
     def print_piece_coordinates(self, event):
         item = self.board.find_closest(event.x, event.y)
@@ -52,7 +48,7 @@ class FrameChessboard(tk.Frame):
 
     def start(self):
         self.menu()
-        self.board_squares()
+        self.draw_chessboard()
         self.show_default_pieces()
 
     def menu(self):
@@ -80,8 +76,6 @@ class FrameChessboard(tk.Frame):
         self._drag_data["x"] = 0
         self._drag_data["y"] = 0
 
-
-
     def find_current_square_coords(self, x, y):
         for item in self.board.find_withtag("square"):
             if self.board.coords(item)[0] <= x <= self.board.coords(item)[2] and self.board.coords(item)[1] <= y <= self.board.coords(item)[3]:
@@ -93,10 +87,7 @@ class FrameChessboard(tk.Frame):
                 return coords_of_current_square
 
     def adjust_current_piece_coords(self, coordinates):
-        print("adjusted coordinates: ")
-        print(coordinates[0] + 25, coordinates[1] + 10)
         return [coordinates[0] + 30, coordinates[1] + 30]
-
 
     def on_piece_motion(self, event):
         '''Handle dragging of an object'''
@@ -131,7 +122,7 @@ class FrameChessboard(tk.Frame):
                 # if it was already highlighted, set it back to its original color
                 self.board.itemconfig(item, fill=self.board.gettags(item2)[1])
 
-    def board_squares(self):
+    def draw_chessboard(self):
         # DRAW CHESSBOARD
         # coordinates[0]: start space from left. at every letter (a-h) += 62.5. start = 0. resets at every num
         # coordinates[1]: start space from top. at every row (number) += 62.5. start = 0. never resets.
@@ -145,7 +136,7 @@ class FrameChessboard(tk.Frame):
             coordinates[2] = 62.5
             for letter in range(8):
                 # decide square color
-                if number % 2 == 0:
+                if number % 2 != 0:
                     if color_index % 2 != 0:
                         color = "white"
                     else:
@@ -178,4 +169,4 @@ class FrameChessboard(tk.Frame):
             coordinates_of_element = self.board.coords(canvas_element)
             tk.Canvas.create_text(self.board, coordinates_of_element[0] + 30, coordinates_of_element[1] + 30,
                                   text=self.unicode_piece_symbols[self.pieces_position[coordinate]], font=("Arial", 30),
-                                  activefill="green", tags="piece", width="30")
+                                  activefill="green", tags=("piece", self.pieces_position[coordinate]), width="30")

@@ -1,3 +1,5 @@
+import os
+import sys
 import tkinter as tk
 from FrameChessboard import *
 from win32api import GetSystemMetrics
@@ -7,27 +9,33 @@ from ctypes import windll
 
 class Application(tk.Tk):
     def __init__(self, *args, **kwargs):
-        # variables for center app in the screen
-        self.x = ""
-        self.y = ""
         # Initialize the GUI
         tk.Tk.__init__(self, *args, **kwargs)
-        self.window = tk.Frame(self, width=1000, height=800, background="#232F3E")
+        self.window = tk.Frame(self, width=500, height=500, background="#232F3E")
         self.window.pack(side="top", expand=True)
+        self.geometry('%dx%d+%d+%d' % (500, 520, self.center_app_inthescreen()[0],
+                                    self.center_app_inthescreen()[1]))
+        self.title("Chess")
+        self.unblur()
+        self.resizable(False, False)
+        self.tk.call('wm', 'iconphoto', self._w, tk.PhotoImage(file=self.resource_path("chess.png")))
         #
         self.show_frame()
-        #
-        self.lastx = ""
-        self.lasty = ""
+
+    def resource_path(self, relative_path):
+        if hasattr(sys, '_MEIPASS'):
+            return os.path.join(sys._MEIPASS, relative_path)
+        return os.path.join(os.path.abspath("."), relative_path)
 
     def center_app_inthescreen(self):
         screen_width = GetSystemMetrics(0)
         screen_height = GetSystemMetrics(1)
         # calculate position x and y coordinates
-        self.x = (screen_width / 2) - (0 / 2)
-        self.y = (screen_height / 2) - (700 / 2)
+        x = (screen_width / 2) - 250
+        y = (screen_height / 2) - 400
+        return [x, y]
 
-    def unblurry(self):
+    def unblur(self):
         windll.shcore.SetProcessDpiAwareness(1)
 
     def show_frame(self):
