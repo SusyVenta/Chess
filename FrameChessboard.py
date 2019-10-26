@@ -15,7 +15,7 @@ class FrameChessboard(tk.Frame):
             "KI": u"♔", "ki": u"♚",
             "P": u"♙", "p": u"♟",
         }
-        self.game = self.start_game()
+        self.game = Game()
         self.pieces_position = self.game.pieces_position
 
         # this data is used to keep track of an item being dragged
@@ -25,12 +25,13 @@ class FrameChessboard(tk.Frame):
         self.board.pack()
         self.allow_pieces_to_move(self.game.player_moving)
 
-    @staticmethod
-    def start_game():
-        return Game()
+    def tag_unbind(self, old_player):
+        self.board.tag_unbind("{}_piece".format(old_player), "<ButtonPress-1>")
+        self.board.tag_unbind("{}_piece".format(old_player), "<ButtonRelease-1>")
+        self.board.tag_unbind("{}_piece".format(old_player), "<B1-Motion>")
 
     def allow_pieces_to_move(self, current_player):
-        print(current_player)
+        print("current player: {}".format(current_player))
         # add bindings for clicking, dragging and releasing over any object with the "piece" tag
         self.board.tag_bind("{}_piece".format(current_player), "<ButtonPress-1>", self.on_piece_press)
         self.board.tag_bind("{}_piece".format(current_player), "<ButtonRelease-1>", self.on_piece_release)
@@ -78,10 +79,15 @@ class FrameChessboard(tk.Frame):
         self._drag_data["item"] = None
         self._drag_data["x"] = 0
         self._drag_data["y"] = 0
-
+        self.disable_moves_for_old_player_and_enable_for_new()
+         
+    def disable_moves_for_old_player_and_enable_for_new(self):
         # check that move has actually occurred
         # if move successful --> update turn
-        self.game.update_current_player()
+        old_player = self.game.player_moving
+        self.tag_unbind(old_player)
+        new_player = self.game.update_current_player()
+        self.allow_pieces_to_move(new_player)
 
     def find_current_square_coords(self, x, y):
         for item in self.board.find_withtag("square"):
