@@ -25,7 +25,8 @@ class FrameChessboard(tk.Frame):
         self.board.pack()
         self.allow_pieces_to_move(self.game.player_moving)
         self.piece_moving = None
-        self.piece_moving_start_position = None
+        self.piece_moving_start_coordinates = []
+        self.piece_moving_start_tag_position = None
         self.piece_moving_end_position = None
 
     def tag_unbind(self, old_player):
@@ -73,25 +74,29 @@ class FrameChessboard(tk.Frame):
         # record the item and its location
         self._drag_data["item"] = self.board.find_closest(event.x, event.y)[0]
         self.piece_moving = self.board.gettags(self._drag_data["item"])[1]
-        self.piece_moving_start_position = self.find_current_square_tag_coordinates(event.x, event.y)
+        self.piece_moving_start_tag_position = self.find_current_square_tag_coordinates(event.x, event.y)
+        self.piece_moving_start_coordinates = [adjusted_x, adjusted_y]
         # print("piece moving: {}".format(self.piece_moving))
         # print("piece moving start position: {}".format(self.piece_moving_start_position))
         self._drag_data["x"] = adjusted_x
         self._drag_data["y"] = adjusted_y
 
     def on_piece_release(self, event):
+        if self.game.is_end_position_free_or_with_opponent_piece(self.piece_moving, self.piece_moving_end_position):
+            print("end position free or with opponent piece")
+            self.game.update_pieces_position(self.piece_moving, self.piece_moving_start_tag_position,
+                                             self.piece_moving_end_position)
+            self.piece_moving = None
+            self.piece_moving_start_tag_position = None
+            self.piece_moving_end_position = None
+            self.disable_moves_for_old_player_and_enable_for_new()
+        else:
+            self.put_piece_where_it_was()
         '''End drag of an object'''
         # reset the drag information
         self._drag_data["item"] = None
-
         self._drag_data["x"] = 0
         self._drag_data["y"] = 0
-        self.game.update_pieces_position(self.piece_moving, self.piece_moving_start_position,
-                                         self.piece_moving_end_position)
-        self.piece_moving = None
-        self.piece_moving_start_position = None
-        self.piece_moving_end_position = None
-        self.disable_moves_for_old_player_and_enable_for_new()
 
     def disable_moves_for_old_player_and_enable_for_new(self):
         # check that move has actually occurred
@@ -123,6 +128,13 @@ class FrameChessboard(tk.Frame):
 
     def adjust_current_piece_coords(self, coordinates):
         return [coordinates[0] + 30, coordinates[1] + 30]
+
+    def put_piece_where_it_was(self):
+        # compute how much the mouse has moved
+        delta_x = self.piece_moving_start_coordinates[0] - self._drag_data["x"]
+        delta_y = self.piece_moving_start_coordinates[1] - self._drag_data["y"]
+        # move the object the appropriate amount
+        self.board.move(self._drag_data["item"], delta_x, delta_y)
 
     def on_piece_motion(self, event):
         '''Handle dragging of an object'''
