@@ -8,33 +8,26 @@ class Game:
                                 "a1": "R", "b1": "K", "c1": "B", "d1": "Q", "e1": "KI", "f1": "B", "g1": "K", "h1": "R"}
         self.pieces_configurations_of_all_turns = {0: self.pieces_position}
 
-        # self.make_current_player_move()
-
     def update_current_player(self):
         if self.player_moving == "white":
             self.player_moving = "black"
         else:
             self.player_moving = "white"
+        self.moves_done += 1
         return self.player_moving
 
-    # def make_current_player_move(self):
+    def update_pieces_position(self, piece_moved, start_coordinates, end_coordinates):
+        print("previous pieces config:")
+        print(self.pieces_position[start_coordinates])
+        del self.pieces_position[start_coordinates]
+        # block taking your own pieces to be done in framework
+        self.pieces_position[end_coordinates] = piece_moved
+        self.pieces_configurations_of_all_turns[self.moves_done] = self.pieces_position
 
-
-    # def move(self, piece, starting_coordinates, end_coordinates):
-    #     # delete piece and owner from old position
-    #
-    #     # put piece and owner in new position
-    #
-    # def check_mate(self):
-    #     if self.turn == 10:
-    #         return True
-    #
-    # def turn(self):
-    #     while not self.check_mate():
-    #         if self.moves_done % 2 == 0:
-    #             self.player_moving = 1
-    #         else:
-    #             self.player_moving = 0
-
-
-game = Game()
+        print("new config:")
+        try:
+            print(self.pieces_position[start_coordinates])
+        except KeyError:
+            print("no piece found in old position")
+        print(self.pieces_position[end_coordinates])
+        print(self.pieces_configurations_of_all_turns)
