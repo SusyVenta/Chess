@@ -1,5 +1,6 @@
 import tkinter as tk
 from Game import *
+from Pieces import *
 
 
 class FrameChessboard(tk.Frame):
@@ -105,7 +106,6 @@ class FrameChessboard(tk.Frame):
 
     def on_piece_release(self, event):
         if self.game.is_end_position_free_or_with_opponent_piece(self.piece_moving, self.piece_moving_end_tag_position):
-            print("end position free or with opponent piece")
             if self.game.update_pieces_position(self.piece_moving, self.piece_moving_start_tag_position,
                                                 self.piece_moving_end_tag_position):
                 self.remove_taken_piece_from_board()
@@ -122,8 +122,6 @@ class FrameChessboard(tk.Frame):
         self._drag_data["y"] = 0
 
     def disable_moves_for_old_player_and_enable_for_new(self):
-        # check that move has actually occurred
-        # if move successful --> update turn
         old_player = self.game.player_moving
         self.tag_unbind(old_player)
         new_player = self.game.update_current_player()
@@ -133,7 +131,7 @@ class FrameChessboard(tk.Frame):
         for item in self.board.find_withtag("square"):
             if self.board.coords(item)[0] <= x <= self.board.coords(item)[2] and self.board.coords(item)[1] <= y <= self.board.coords(item)[3]:
                 tag_coords_of_current_square = self.board.gettags(item)[1]
-                print(tag_coords_of_current_square)
+                # print(tag_coords_of_current_square)
                 # print(self.board.coords(item))
                 # print(self.board.gettags("current"))
                 # print(self.board.coords("current"))
