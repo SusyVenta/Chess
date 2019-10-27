@@ -17,30 +17,20 @@ class Game:
         return self.player_moving
 
     def update_pieces_position(self, piece_moved, start_coordinates, end_coordinates):
-        # print("previous pieces config:")
-        # print(self.pieces_position[start_coordinates])
+        need_to_remove_taken_piece = False
         del self.pieces_position[start_coordinates]
-        # block taking your own pieces to be done in framework
+        if end_coordinates in self.pieces_position.keys():
+            need_to_remove_taken_piece = True
         self.pieces_position[end_coordinates] = piece_moved
         self.pieces_configurations_of_all_turns[self.moves_done] = self.pieces_position
-
-        # print("new config:")
-        # try:
-            # print(self.pieces_position[start_coordinates])
-        # except KeyError:
-        #     print("no piece found in old position")
-        # print(self.pieces_position[end_coordinates])
-        # print(self.pieces_configurations_of_all_turns)
+        return need_to_remove_taken_piece
 
     def is_end_position_free_or_with_opponent_piece(self, piece_moved, end_coordinates):
         if end_coordinates in self.pieces_position.keys():
             if (piece_moved.islower() and self.pieces_position[end_coordinates].isupper()) or (
                     piece_moved.isupper() and self.pieces_position[end_coordinates].islower()):
-                print("both lower or upper. returning true")
                 return True
             else:
-                print("returning false")
                 return False
         else:
-            print("end coordinate not in pieces position. returning true")
             return True
