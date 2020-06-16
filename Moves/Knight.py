@@ -13,12 +13,49 @@ class Knight:
         print(f"current_coordinate_number: {current_coordinate_number}")
         current_coordinate_letter = self.utils.get_current_letter(start_tag)
         print(f"current_coordinate_letter: {current_coordinate_letter}")
+        current_letter_number = self.utils.letter_to_number(current_coordinate_letter)
+        all_moves = []
 
-        
-        vertical_moves = self.get_vertical_moves_possible(current_coordinate_letter, current_coordinate_number)
-        print(vertical_moves)
-        horizontal_moves = self.get_horizontal_moves_possible(current_coordinate_letter, current_coordinate_number)
-        print(horizontal_moves)
-        all_moves = vertical_moves + horizontal_moves
+        """ Combinations by 2 up """
+        if current_coordinate_number + 2 in range(1, 9):
+            """ Try 2 down, 1 right """
+            if current_letter_number + 1 in range(1, 9):
+                all_moves.append(
+                    f"{self.utils.number_to_letter(current_letter_number + 1)}{current_coordinate_number + 2}")
+            """ Try 2 down, 1 left """
+            if current_letter_number - 1 in range(1, 9):
+                all_moves.append(
+                    f"{self.utils.number_to_letter(current_letter_number - 1)}{current_coordinate_number + 2}")
+        """ Combinations by 2 down """
+        if current_coordinate_number - 2 in range(1, 9):
+            """ Try 2 down, 1 right """
+            if current_letter_number + 1 in range(1, 9):
+                all_moves.append(
+                    f"{self.utils.number_to_letter(current_letter_number + 1)}{current_coordinate_number - 2}")
+            """ Try 2 down, 1 left """
+            if current_letter_number - 1 in range(1, 9):
+                all_moves.append(
+                    f"{self.utils.number_to_letter(current_letter_number - 1)}{current_coordinate_number - 2}")
+        """ Combinations by 2 right"""
+        if current_letter_number + 2 in range(1, 9):
+            """ Try 2 right, 1 up """
+            if current_coordinate_number + 1 in range(1, 9):
+                all_moves.append(
+                    f"{self.utils.number_to_letter(current_letter_number + 2)}{current_coordinate_number + 1}")
+            """ Try 2 right, 1 down """
+            if current_coordinate_number - 1 in range(1, 9):
+                all_moves.append(
+                    f"{self.utils.number_to_letter(current_letter_number + 2)}{current_coordinate_number - 1}")
+        """ Combinations by 2 left"""
+        if current_letter_number - 2 in range(1, 9):
+            """ Try 2 left, 1 up """
+            if current_coordinate_number + 1 in range(1, 9):
+                all_moves.append(
+                    f"{self.utils.number_to_letter(current_letter_number - 2)}{current_coordinate_number + 1}")
+            """ Try 2 left, 1 down """
+            if current_coordinate_number - 1 in range(1, 9):
+                all_moves.append(
+                    f"{self.utils.number_to_letter(current_letter_number - 2)}{current_coordinate_number - 1}")
+
         print(all_moves)
         return all_moves

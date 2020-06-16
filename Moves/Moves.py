@@ -20,6 +20,6 @@ class Moves:
             "b": Bishop(),
             "q": Queen(),
             "ki": King(),
-            "p": Pawn()
+            "p": Pawn(piece)
         }
         return piece_letter_to_class_map[piece.lower()]

@@ -16,6 +16,7 @@ class Bishop:
             + self.move_up_leftwards(current_coordinate_number, current_coordinate_letter) \
             + self.move_down_leftwards(current_coordinate_number, current_coordinate_letter) \
             + self.move_down_rightwards(current_coordinate_number, current_coordinate_letter)
+        print(all_moves)
         return all_moves
 
     def move_up_rightwards(self, current_coordinate_number, current_coordinate_letter):

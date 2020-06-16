@@ -18,9 +18,7 @@ class Rook:
         current_coordinate_letter = self.utils.get_current_letter(start_tag)
         print(f"current_coordinate_letter: {current_coordinate_letter}")
         vertical_moves = self.get_vertical_moves_possible(current_coordinate_letter, current_coordinate_number)
-        print(vertical_moves)
         horizontal_moves = self.get_horizontal_moves_possible(current_coordinate_letter, current_coordinate_number)
-        print(horizontal_moves)
         all_moves = vertical_moves + horizontal_moves
         print(all_moves)
         return all_moves
