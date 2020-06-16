@@ -1,6 +1,6 @@
 import tkinter as tk
-from Game import *
-from Pieces import *
+from Chess.Game import Game
+from Chess.Moves.Moves import Moves
 
 
 class FrameChessboard(tk.Frame):
@@ -22,7 +22,7 @@ class FrameChessboard(tk.Frame):
         # this data is used to keep track of an item being dragged
         self._drag_data = {"x": 0, "y": 0, "item": None}
 
-        self.board = tk.Canvas(self, width=500, height=500)
+        self.board = tk.Canvas(self, width=590, height=590)
         self.board.pack()
         self.allow_pieces_to_move(self.game.player_moving)
         self.piece_moving = None
@@ -66,6 +66,8 @@ class FrameChessboard(tk.Frame):
         self.menubar.add_cascade(label="Menu", menu=self.filemenu)
         self.filemenu.add_command(label="Quit", command=self.controller.destroy)
         self.filemenu.add_command(label="New Game", command=self.controller.destroy)
+        # self.filemenu.add_command(label="Undo move", command=self.controller.destroy)
+        # self.filemenu.add_command(label="Redo move", command=self.controller.destroy)
 
     def on_piece_press(self, event):
         '''Begining drag of an object'''
@@ -105,7 +107,11 @@ class FrameChessboard(tk.Frame):
         self.board.delete(taken_piece)
 
     def on_piece_release(self, event):
+        print(f"piece moving: {self.piece_moving}")
+        print(f"end position tag: {self.piece_moving_end_tag_position}")
+        print(f"start tag position: {self.piece_moving_start_tag_position}")
         if self.game.is_end_position_free_or_with_opponent_piece(self.piece_moving, self.piece_moving_end_tag_position):
+            print(Moves().move_is_possible(self.piece_moving, self.piece_moving_start_tag_position, self.piece_moving_end_tag_position))
             if self.game.update_pieces_position(self.piece_moving, self.piece_moving_start_tag_position,
                                                 self.piece_moving_end_tag_position):
                 self.remove_taken_piece_from_board()

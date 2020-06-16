@@ -10,14 +10,15 @@ class Application(tk.Tk):
     def __init__(self, *args, **kwargs):
         # Initialize the GUI
         tk.Tk.__init__(self, *args, **kwargs)
-        self.window = tk.Frame(self, width=500, height=500, background="#232F3E")
+        self.window = tk.Frame(self, width=600, height=600, background="#232F3E")
         self.window.pack(side="top", expand=True)
-        self.geometry('%dx%d+%d+%d' % (500, 520, self.center_app_inthescreen()[0],
-                                       self.center_app_inthescreen()[1]))
+        # self.geometry('%dx%d+%d+%d' % (600, 620, self.center_app_inthescreen()[0],
+        #                                self.center_app_inthescreen()[1]))
+        self.geometry('%sx%s' % (int(self.winfo_screenwidth() / 2.2), int(self.winfo_screenheight() / 2.2)))
         self.title("Chess")
         self.unblur()
         self.resizable(False, False)
-        self.tk.call('wm', 'iconphoto', self._w, tk.PhotoImage(file=self.resource_path("chess.png")))
+        self.tk.call('wm', 'iconphoto', self._w, tk.PhotoImage(file=self.resource_path("Icons\chess.png")))
         #
         self.show_frame()
 
