@@ -87,7 +87,8 @@ class FrameChessboard(tk.Frame):
     def find_piece_on_given_square(self, square_tag_coordinates):
         square = self.board.find_withtag(square_tag_coordinates)
         coordinates_of_square = self.board.coords(square)
-        enclosed_objects = self.board.find_enclosed(coordinates_of_square[0], coordinates_of_square[1], coordinates_of_square[2], coordinates_of_square[3])
+        enclosed_objects = self.board.find_enclosed(coordinates_of_square[0], coordinates_of_square[1],
+                                                    coordinates_of_square[2], coordinates_of_square[3])
         for item in enclosed_objects:
             if self.piece_moving.islower():
                 try:
@@ -110,10 +111,15 @@ class FrameChessboard(tk.Frame):
         print(f"piece moving: {self.piece_moving}")
         print(f"end position tag: {self.piece_moving_end_tag_position}")
         print(f"start tag position: {self.piece_moving_start_tag_position}")
-        if self.game.is_end_position_free_or_with_opponent_piece(self.piece_moving, self.piece_moving_end_tag_position):
-            print(Moves().move_is_possible(self.piece_moving, self.piece_moving_start_tag_position, self.piece_moving_end_tag_position))
-            if self.game.update_pieces_position(self.piece_moving, self.piece_moving_start_tag_position,
-                                                self.piece_moving_end_tag_position):
+        self.game.temporary_update_pieces_position_next_turn(self.piece_moving, self.piece_moving_start_tag_position,
+                                                             self.piece_moving_end_tag_position)
+        if ((self.game.is_end_position_free_or_with_opponent_piece(
+                self.piece_moving, self.piece_moving_end_tag_position)) and (
+                Moves().move_is_possible(self.piece_moving, self.piece_moving_start_tag_position,
+                                         self.piece_moving_end_tag_position,
+                                         self.game.pieces_configurations_of_all_turns, self.game.moves_done))):
+            if self.game.temporary_update_pieces_position_next_turn(self.piece_moving, self.piece_moving_start_tag_position,
+                                                        self.piece_moving_end_tag_position):
                 self.remove_taken_piece_from_board()
             self.piece_moving = None
             self.piece_moving_start_tag_position = None
@@ -121,6 +127,7 @@ class FrameChessboard(tk.Frame):
             self.disable_moves_for_old_player_and_enable_for_new()
         else:
             self.put_piece_where_it_was()
+            del self.game.pieces_configurations_of_all_turns[self.game.moves_done + 1]
         '''End drag of an object'''
         # reset the drag information
         self._drag_data["item"] = None

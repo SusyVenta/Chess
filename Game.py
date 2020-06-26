@@ -16,21 +16,32 @@ class Game:
         self.moves_done += 1
         return self.player_moving
 
-    def update_pieces_position(self, piece_moved, start_coordinates, end_coordinates):
+    def temporary_update_pieces_position_next_turn(self, piece_moved, start_coordinates, end_coordinates):
         need_to_remove_taken_piece = False
-        del self.pieces_position[start_coordinates]
-        if end_coordinates in self.pieces_position.keys():
+        self.pieces_configurations_of_all_turns[self.moves_done + 1] = self.pieces_configurations_of_all_turns[self.moves_done].copy()
+        del self.pieces_configurations_of_all_turns[self.moves_done + 1][start_coordinates]
+        if end_coordinates in self.pieces_configurations_of_all_turns[self.moves_done + 1].keys():
             need_to_remove_taken_piece = True
-        self.pieces_position[end_coordinates] = piece_moved
-        self.pieces_configurations_of_all_turns[self.moves_done] = self.pieces_position
+        self.pieces_configurations_of_all_turns[self.moves_done + 1][end_coordinates] = piece_moved
+        return need_to_remove_taken_piece
+
+    def need_to_update_pieces_position(self, piece_moved, start_coordinates, end_coordinates):
+        need_to_remove_taken_piece = False
+        next_turn_configuration = self.pieces_configurations_of_all_turns[self.moves_done].copy()
+        del next_turn_configuration[start_coordinates]
+        if end_coordinates in next_turn_configuration.keys():
+            need_to_remove_taken_piece = True
+        next_turn_configuration[end_coordinates] = piece_moved
+        self.pieces_configurations_of_all_turns[self.moves_done + 1] = next_turn_configuration
         return need_to_remove_taken_piece
 
     def is_end_position_free_or_with_opponent_piece(self, piece_moved, end_coordinates):
-        if end_coordinates in self.pieces_position.keys():
-            if (piece_moved.islower() and self.pieces_position[end_coordinates].isupper()) or (
-                    piece_moved.isupper() and self.pieces_position[end_coordinates].islower()):
+        if end_coordinates in self.pieces_configurations_of_all_turns[self.moves_done].keys():
+            if (piece_moved.islower() and self.pieces_configurations_of_all_turns[self.moves_done][end_coordinates].isupper()) or (
+                    piece_moved.isupper() and self.pieces_configurations_of_all_turns[self.moves_done][end_coordinates].islower()):
                 return True
             else:
                 return False
         else:
             return True
+

@@ -2,8 +2,9 @@ from Chess.Utils import Utils
 
 
 class Rook:
-    def __init__(self):
+    def __init__(self, piece_moving):
         self.utils = Utils()
+        self.piece_moving = piece_moving
 
     def move_is_possible(self, start_tag, end_tag):
         return end_tag in self.get_all_allowed_moves(start_tag)

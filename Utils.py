@@ -22,3 +22,18 @@ class Utils:
         all_letters = ["a", "b", "c", "d", "e", "f", "g", "h"]
         all_letters.remove(current_letter)
         return all_letters
+
+    def end_position_is_free(self, end_coordinates, pieces_position):
+        if end_coordinates in pieces_position.keys():
+            return False
+        return True
+
+    def end_position_contains_opponent_piece(self, piece_moved, end_coordinates, pieces_position):
+        if end_coordinates in pieces_position.keys():
+            if (piece_moved.islower() and pieces_position[end_coordinates].isupper()) or (
+                    piece_moved.isupper() and pieces_position[end_coordinates].islower()):
+                return True
+        return False
+
+    def is_white_moving(self, piece_moved):
+        return piece_moved.isupper()
