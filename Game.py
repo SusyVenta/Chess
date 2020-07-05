@@ -16,13 +16,23 @@ class Game:
         self.moves_done += 1
         return self.player_moving
 
-    def temporary_update_pieces_position_next_turn(self, piece_moved, start_coordinates, end_coordinates):
+    def temporary_update_pieces_position_next_turn(self, piece_moved, start_coordinates, end_coordinates,
+                                                   extra_piece_to_remove_coordinates=None):
         need_to_remove_taken_piece = False
         self.pieces_configurations_of_all_turns[self.moves_done + 1] = self.pieces_configurations_of_all_turns[self.moves_done].copy()
+        print("############## before removing")
+        print(self.pieces_configurations_of_all_turns[self.moves_done + 1])
         del self.pieces_configurations_of_all_turns[self.moves_done + 1][start_coordinates]
+
         if end_coordinates in self.pieces_configurations_of_all_turns[self.moves_done + 1].keys():
             need_to_remove_taken_piece = True
         self.pieces_configurations_of_all_turns[self.moves_done + 1][end_coordinates] = piece_moved
+        if extra_piece_to_remove_coordinates:
+            if extra_piece_to_remove_coordinates in self.pieces_configurations_of_all_turns[self.moves_done + 1].keys():
+                del self.pieces_configurations_of_all_turns[self.moves_done + 1][extra_piece_to_remove_coordinates]
+            need_to_remove_taken_piece = True
+        print("after removing:")
+        print(self.pieces_configurations_of_all_turns[self.moves_done + 1])
         return need_to_remove_taken_piece
 
     def need_to_update_pieces_position(self, piece_moved, start_coordinates, end_coordinates):

@@ -10,11 +10,10 @@ class Application(tk.Tk):
     def __init__(self, *args, **kwargs):
         # Initialize the GUI
         tk.Tk.__init__(self, *args, **kwargs)
-        self.window = tk.Frame(self, width=600, height=600, background="#232F3E")
+        self.window = tk.Frame(self, width=500, height=500, background="#232F3E")
+        self.resizable(width=tk.TRUE, height=tk.TRUE)
         self.window.pack(side="top", expand=True)
-        # self.geometry('%dx%d+%d+%d' % (600, 620, self.center_app_inthescreen()[0],
-        #                                self.center_app_inthescreen()[1]))
-        self.geometry('%sx%s' % (int(self.winfo_screenwidth() / 2.2), int(self.winfo_screenheight() / 2.2)))
+        self.geometry('%sx%s' % (int(self.winfo_screenwidth() / 2), int(self.winfo_screenheight() / 2)))
         self.title("Chess")
         self.unblur()
         self.resizable(False, False)
@@ -26,14 +25,6 @@ class Application(tk.Tk):
         if hasattr(sys, '_MEIPASS'):
             return os.path.join(sys._MEIPASS, relative_path)
         return os.path.join(os.path.abspath("."), relative_path)
-
-    def center_app_inthescreen(self):
-        screen_width = GetSystemMetrics(0)
-        screen_height = GetSystemMetrics(1)
-        # calculate position x and y coordinates
-        x = (screen_width / 2) - 250
-        y = (screen_height / 2) - 400
-        return [x, y]
 
     def unblur(self):
         windll.shcore.SetProcessDpiAwareness(1)

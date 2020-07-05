@@ -22,7 +22,7 @@ class FrameChessboard(tk.Frame):
         # this data is used to keep track of an item being dragged
         self._drag_data = {"x": 0, "y": 0, "item": None}
 
-        self.board = tk.Canvas(self, width=590, height=590)
+        self.board = tk.Canvas(self, width=800, height=800)
         self.board.pack()
         self.allow_pieces_to_move(self.game.player_moving)
         self.piece_moving = None
@@ -103,14 +103,14 @@ class FrameChessboard(tk.Frame):
                 except IndexError:
                     pass
 
-    def remove_taken_piece_from_board(self):
-        taken_piece = self.find_piece_on_given_square(self.piece_moving_end_tag_position)
+    def remove_taken_piece_from_board(self, end_square_coordinate):
+        taken_piece = self.find_piece_on_given_square(end_square_coordinate)
         self.board.delete(taken_piece)
 
     def on_piece_release(self, event):
         print(f"piece moving: {self.piece_moving}")
-        print(f"end position tag: {self.piece_moving_end_tag_position}")
         print(f"start tag position: {self.piece_moving_start_tag_position}")
+        print(f"end position tag: {self.piece_moving_end_tag_position}")
         self.game.temporary_update_pieces_position_next_turn(self.piece_moving, self.piece_moving_start_tag_position,
                                                              self.piece_moving_end_tag_position)
         if ((self.game.is_end_position_free_or_with_opponent_piece(
@@ -118,9 +118,22 @@ class FrameChessboard(tk.Frame):
                 Moves().move_is_possible(self.piece_moving, self.piece_moving_start_tag_position,
                                          self.piece_moving_end_tag_position,
                                          self.game.pieces_configurations_of_all_turns, self.game.moves_done))):
-            if self.game.temporary_update_pieces_position_next_turn(self.piece_moving, self.piece_moving_start_tag_position,
-                                                        self.piece_moving_end_tag_position):
-                self.remove_taken_piece_from_board()
+            if self.piece_moving.lower() == "p":
+                en_passant = Moves().get_piece_class(self.piece_moving).en_passant(
+                    self.piece_moving_start_tag_position, self.game.pieces_configurations_of_all_turns,
+                    self.game.moves_done)
+                print(f"en_passant_moves: {en_passant}")
+                if self.piece_moving_end_tag_position in en_passant.keys():
+                    if self.game.temporary_update_pieces_position_next_turn(
+                            self.piece_moving, self.piece_moving_start_tag_position,
+                            self.piece_moving_end_tag_position, en_passant[self.piece_moving_end_tag_position]):
+                        self.remove_taken_piece_from_board(en_passant[self.piece_moving_end_tag_position])
+                else:
+                    self.remove_taken_piece_from_board(self.piece_moving_end_tag_position)
+            else:
+                if self.game.temporary_update_pieces_position_next_turn(
+                        self.piece_moving, self.piece_moving_start_tag_position, self.piece_moving_end_tag_position):
+                    self.remove_taken_piece_from_board(self.piece_moving_end_tag_position)
             self.piece_moving = None
             self.piece_moving_start_tag_position = None
             self.piece_moving_end_tag_position = None
