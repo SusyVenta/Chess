@@ -9,9 +9,11 @@ class Pawn:
     def move_is_possible(self, start_tag, end_tag, all_turns_pieces_position, max_turn):
         return end_tag in self.get_all_allowed_moves(start_tag, all_turns_pieces_position, max_turn)
 
-    def get_all_allowed_moves(self, start_tag, all_turns_pieces_position, max_turn):
+    def get_all_allowed_moves(self, start_tag, all_turns_pieces_position, max_turn, piece=None):
         current_coordinate_number = int(self.utils.get_current_number(start_tag))
         current_coordinate_letter = self.utils.get_current_letter(start_tag)
+        print(f"max_turn: {max_turn}")
+        print(f"all_turns_pieces_position: {all_turns_pieces_position}")
         current_pieces_position = all_turns_pieces_position[max_turn]
         all_moves = []
         if self.utils.is_white_moving(self.piece_moving):

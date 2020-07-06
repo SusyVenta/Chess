@@ -16,6 +16,7 @@ class FrameChessboard(tk.Frame):
             "KI": u"♔", "ki": u"♚",
             "P": u"♙", "p": u"♟",
         }
+        self.current_board_colors = {}
         self.game = Game()
         self.pieces_position = self.game.pieces_position
 
@@ -40,7 +41,7 @@ class FrameChessboard(tk.Frame):
         self.board.tag_bind("{}_piece".format(current_player), "<ButtonPress-1>", self.on_piece_press)
         self.board.tag_bind("{}_piece".format(current_player), "<ButtonRelease-1>", self.on_piece_release)
         self.board.tag_bind("{}_piece".format(current_player), "<B1-Motion>", self.on_piece_motion)
-        self.board.tag_bind("square", "<Motion>", self.highlight_square)
+        # self.board.tag_bind("square", "<Motion>", self.highlight_square)
 
     def print_piece_coordinates(self, event):
         item = self.board.find_closest(event.x, event.y)
@@ -79,6 +80,7 @@ class FrameChessboard(tk.Frame):
         self.piece_moving = self.board.gettags(self._drag_data["item"])[1]
         self.piece_moving_start_tag_position = self.find_current_square_tag_coordinates(event.x, event.y)
         self.piece_moving_start_coordinates = [adjusted_x, adjusted_y]
+        self.highlight_moves_by_clicking_on_piece(piece_moving=self.piece_moving, start_tag=self.piece_moving_start_tag_position)
         # print("piece moving: {}".format(self.piece_moving))
         # print("piece moving start position: {}".format(self.piece_moving_start_position))
         self._drag_data["x"] = adjusted_x
@@ -115,14 +117,15 @@ class FrameChessboard(tk.Frame):
                                                              self.piece_moving_end_tag_position)
         if ((self.game.is_end_position_free_or_with_opponent_piece(
                 self.piece_moving, self.piece_moving_end_tag_position)) and (
-                Moves().move_is_possible(self.piece_moving, self.piece_moving_start_tag_position,
-                                         self.piece_moving_end_tag_position,
-                                         self.game.pieces_configurations_of_all_turns, self.game.moves_done))):
+                Moves().move_is_possible(piece=self.piece_moving, start_tag=self.piece_moving_start_tag_position,
+                                         end_tag=self.piece_moving_end_tag_position,
+                                         all_turns_pieces_position=self.game.pieces_configurations_of_all_turns,
+                                         max_turn=self.game.moves_done))):
+            print("move possible")
             if self.piece_moving.lower() == "p":
                 en_passant = Moves().get_piece_class(self.piece_moving).en_passant(
                     self.piece_moving_start_tag_position, self.game.pieces_configurations_of_all_turns,
                     self.game.moves_done)
-                print(f"en_passant_moves: {en_passant}")
                 if self.piece_moving_end_tag_position in en_passant.keys():
                     if self.game.temporary_update_pieces_position_next_turn(
                             self.piece_moving, self.piece_moving_start_tag_position,
@@ -139,6 +142,7 @@ class FrameChessboard(tk.Frame):
             self.piece_moving_end_tag_position = None
             self.disable_moves_for_old_player_and_enable_for_new()
         else:
+            print("move not possible")
             self.put_piece_where_it_was()
             del self.game.pieces_configurations_of_all_turns[self.game.moves_done + 1]
         '''End drag of an object'''
@@ -146,6 +150,10 @@ class FrameChessboard(tk.Frame):
         self._drag_data["item"] = None
         self._drag_data["x"] = 0
         self._drag_data["y"] = 0
+        for square_color_changed in self.current_board_colors.keys():
+            square = self.board.find_withtag(square_color_changed)
+            self.board.itemconfig(square, fill=self.current_board_colors[square_color_changed])
+        self.current_board_colors = {}
 
     def disable_moves_for_old_player_and_enable_for_new(self):
         old_player = self.game.player_moving
@@ -198,24 +206,16 @@ class FrameChessboard(tk.Frame):
         self._drag_data["x"] = adjusted_coordinates[0]
         self._drag_data["y"] = adjusted_coordinates[1]
 
-    def highlight_moves_by_clicking_on_square(self, event):
-        # get object closest to to current mouse position
-        item2 = self.board.find_closest(event.x, event.y)
-        # get 3d tag of the closest element
-        current_piece = self.board.gettags(item2)[2]
-        # item = highlighted piece
-        # item = self.frames["FrameChessboard"].a7
-
-        if current_piece == "rook" and 'a7' in self.board.gettags(item)[0]:
-            # get current color of the square
-            current_color = self.board.itemcget(item, 'fill')
-            # if current square is not highlighted
-            if current_color == 'grey' or current_color == "white":
-                # highlight square
-                self.board.itemconfig(item, fill='green')
-            else:
-                # if it was already highlighted, set it back to its original color
-                self.board.itemconfig(item, fill=self.board.gettags(item2)[1])
+    def highlight_moves_by_clicking_on_piece(self, piece_moving, start_tag):
+        all_moves_possible = Moves().get_all_possible_moves(
+            piece=piece_moving, start_tag=start_tag, all_turns_pieces_position=self.game.pieces_configurations_of_all_turns,
+            max_turn=self.game.moves_done)
+        self.current_board_colors = {}
+        for coordinate in all_moves_possible:
+            square = self.board.find_withtag(coordinate)
+            current_color = self.board.itemcget(square, 'fill')
+            self.current_board_colors[coordinate] = current_color
+            self.board.itemconfig(square, fill="#F9E79F")
 
     def draw_chessboard(self):
         # DRAW CHESSBOARD
